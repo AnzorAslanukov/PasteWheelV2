@@ -273,7 +273,7 @@ MC-16 packaged exe passes MC-01–MC-15 spot checks
 |---|---|
 | M0 scaffold | ✅ |
 | M1 config + validation | ✅ |
-| M2 state + geometry | ☐ |
+| M2 state + geometry | ✅ |
 | M3 wheel window | ☐ |
 | M4 settings window | ☐ |
 | M5 hooks, tray, wiring | ☐ |
