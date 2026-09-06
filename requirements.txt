@@ -1,0 +1,8 @@
+grapheme==0.6.0
+pynput==1.8.2
+pyperclip==1.11.0
+PySide6==6.11.2
+PySide6_Addons==6.11.2
+PySide6_Essentials==6.11.2
+shiboken6==6.11.2
+six==1.17.0

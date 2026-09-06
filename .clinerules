@@ -1,0 +1,17 @@
+# PasteWheel agent rules
+
+SPEC.md is the single source of truth. Read it in full before writing any code.
+This file is the critical subset of SPEC.md §16 — when in doubt, §16 wins.
+
+1. Implement milestones in §12 order. Do not skip ahead.
+2. Every FR gets ≥1 test named after its FR id. GUI tests must pass with
+   QT_QPA_PLATFORM=offscreen.
+3. After each requirement: `pytest -q` and `ruff check .` must both pass
+   before continuing.
+4. Same test failing 3 consecutive times → STOP and report. No thrashing.
+5. Spec ambiguous or contradictory → STOP and ask the user. Never guess.
+6. Never write outside this project directory. Tests use tmp_path, never
+   real %APPDATA%.
+7. Commit after each green milestone: `M<n>: <summary>`.
+8. Update the §13 progress tracker as milestones complete.
+9. No network calls at runtime; installs only during initial venv setup.
