@@ -251,10 +251,22 @@ MC-16 packaged exe passes MC-01–MC-15 spot checks
 
 1. Dev run: `python -m pastewheel`.
 2. Icons (tray, window, exe) come from `assets/icon.ico`.
-3. Package: `pyinstaller --windowed --icon assets/icon.ico --name PasteWheel`
-   (onedir). No console window.
+3. Package (onedir, no console window):
+   ```
+   pyinstaller --windowed --icon assets/icon.ico --name PasteWheel ^
+       --add-data "assets;assets" pastewheel/__main__.py
+   ```
+   (`--add-data` bundles `assets/icon.ico` into `_internal/assets/` so
+   `main.icon_path()` can resolve it via `sys._MEIPASS` at runtime — SPEC §4
+   ``icon_path()``.) A `PasteWheel.spec` reflecting this command is
+   committed at the repo root; rebuild reproducibly with
+   `pyinstaller PasteWheel.spec` instead of retyping flags. Output:
+   `dist/PasteWheel/PasteWheel.exe` (+ `dist/PasteWheel/_internal/`).
 4. `.exe` is produced **only after** MC-01–MC-15 pass on the dev build
-   (user performs these).
+   (user performs these). The implementer verifies the packaged build itself
+   boots correctly (MC-16 prerequisite: exe launches, tray icon renders,
+   `config.json` is created under real `%APPDATA%`) as part of M6, but the
+   full MC-01–MC-16 spot-check pass/fail judgment remains the user's.
 
 ## 12. Milestones (build order, commit after each green)
 
@@ -277,8 +289,8 @@ MC-16 packaged exe passes MC-01–MC-15 spot checks
 | M3 wheel window | ✅ |
 | M4 settings window | ✅ |
 | M5 hooks, tray, wiring | ✅ |
-| M6 packaging | ☐ |
-| MC-01…MC-15 (user-run) | ☐ |
+| M6 packaging | ✅ |
+| MC-01…MC-16 (user-run) | ☐ |
 
 ## 14. Decision log
 

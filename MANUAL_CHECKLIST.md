@@ -19,3 +19,35 @@ All must pass before milestone M6 (MC-16 re-runs these on the .exe).
 - [ ] MC-14 Garbage config.json → defaults recreated + config.json.bad-<timestamp> created
 - [ ] MC-15 Windows dark/light switch: wheel follows; Settings override works immediately
 - [ ] MC-16 (after M6) packaged .exe passes spot checks of MC-01–MC-15
+
+## Packaging (M6)
+
+Build the onedir executable (from the activated `.venv`, repo root):
+
+```
+pyinstaller PasteWheel.spec
+```
+
+(equivalent to, and reproducing, the one-shot command:
+`pyinstaller --windowed --icon assets/icon.ico --name PasteWheel --add-data "assets;assets" pastewheel/__main__.py`)
+
+Output: `dist/PasteWheel/PasteWheel.exe` plus its `dist/PasteWheel/_internal/`
+support folder — copy/zip the whole `dist/PasteWheel/` folder to distribute,
+never just the `.exe` alone.
+
+Run `dist/PasteWheel/PasteWheel.exe` directly (double-click, or from a
+terminal with no arguments) and re-run MC-01–MC-15 above against it for
+MC-16. Notes specific to the packaged build:
+
+- MC-10 (autostart): only meaningfully testable against the packaged `.exe`,
+  since `autostart.py`'s registry `Run` value stores `sys.executable`, which
+  is `python.exe` (not `PasteWheel.exe`) when running from source. Toggle
+  the autostart checkbox in Settings, then check
+  `HKCU\Software\Microsoft\Windows\CurrentVersion\Run\PasteWheel` (or
+  Task Manager → Startup apps) for a `PasteWheel.exe` entry.
+- `build/` and `dist/` are gitignored (build output only); `PasteWheel.spec`
+  is committed so the build is reproducible without retyping flags.
+- Implementer-verified (M6, technical smoke test — NOT a substitute for the
+  user's MC-01–MC-16 pass): the packaged exe launches, the tray icon renders
+  from the bundled `assets/icon.ico`, `config.json` is created under the
+  real `%APPDATA%\PasteWheel\`, and the process exits cleanly.
