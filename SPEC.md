@@ -1,6 +1,6 @@
 # SPEC.md — PasteWheel v1.0
 
-Status: FINAL for build. D5 pending user confirmation; D6 provisional (see §14).
+Status: FINAL for build. D5 confirmed; D6 provisional (see §14).
 
 ## 1. Overview
 
@@ -276,7 +276,7 @@ MC-16 packaged exe passes MC-01–MC-15 spot checks
 | M2 state + geometry | ✅ |
 | M3 wheel window | ✅ |
 | M4 settings window | ✅ |
-| M5 hooks, tray, wiring | ☐ |
+| M5 hooks, tray, wiring | ✅ |
 | M6 packaging | ☐ |
 | MC-01…MC-15 (user-run) | ☐ |
 
@@ -288,7 +288,7 @@ MC-16 packaged exe passes MC-01–MC-15 spot checks
 | D2 | Left-click on empty space in or outside the wheel closes it | ✅ Confirmed |
 | D3 | Radial equidistant symmetry: 360° ÷ N spacing per ring; 8/16/32 are maxima | ⚠ Awaiting user OK on this reading |
 | D4 | Theme follows Windows system; manual System/Dark/Light override in settings | ✅ Confirmed (user wording) |
-| D5 | Second launch: "already running" balloon + exit | ⚠ Explained to user; pending choice |
+| D5 | Second launch: "already running" balloon + exit (tray balloon only, no modal dialog) | ✅ Confirmed |
 | D6 | Label = single emoji or 1–3 chars (grapheme lib) | 🔶 Provisional; user will discuss later |
 | A1–A3 | Offscreen test gate; accessible names (FR-2.7); E2E deferred | ✅ Confirmed |
 

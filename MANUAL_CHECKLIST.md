@@ -15,7 +15,7 @@ All must pass before milestone M6 (MC-16 re-runs these on the .exe).
 - [ ] MC-10 Autostart toggle adds/removes Startup entry (verify only with packaged .exe)
 - [ ] MC-11 Wheel appears on the monitor holding the pointer (multi-monitor)
 - [ ] MC-12 High-DPI: buttons crisp and correctly placed
-- [ ] MC-13 Second launch: "PasteWheel is already running." dialog, no second tray icon
+- [ ] MC-13 Second launch: "PasteWheel is already running." tray balloon, no second tray icon
 - [ ] MC-14 Garbage config.json → defaults recreated + config.json.bad-<timestamp> created
 - [ ] MC-15 Windows dark/light switch: wheel follows; Settings override works immediately
 - [ ] MC-16 (after M6) packaged .exe passes spot checks of MC-01–MC-15
