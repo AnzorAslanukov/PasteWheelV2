@@ -21,27 +21,17 @@ Last updated: 2026-09-14.
 | Lint | ✅ `ruff check .` clean |
 | Manual checklist MC-01…MC-16 (SPEC §10) | ☐ Not yet run by the user |
 | Packaged `.exe` (`dist/PasteWheel/PasteWheel.exe`) | ✅ Built and smoke-tested; reflects all changes through 2026-09-14 (see §3) |
-| Uncommitted working-tree changes | ⚠️ Yes — see §2 |
+| Uncommitted working-tree changes | ✅ None — working tree clean as of commit `bdcf0c2` |
+| Remote | `https://github.com/AnzorAslanukov/PasteWheelV2.git` (linked 2026-09-14) |
 | Decision log items still open (SPEC §14) | D3 (radial spacing reading) awaiting user OK; D6 (label rule) provisional |
 
 ## 2. Uncommitted changes
 
-As of the last update, the working tree has **unstaged, uncommitted**
-changes relative to the `M6: PyInstaller packaging + MC-16 instructions`
-commit:
-
-- `pastewheel/wheel_window.py` — expand-vs-clipboard visual distinction
-  (dashed border + "+" corner glyph). See §3, 2026-09-14 entry, for details.
-- `tests/test_fr_wheel_window.py` — new tests covering the above.
-
-This work is **not tied to a SPEC.md FR** (it's a user-requested UX
-enhancement layered on top of the finished v1.0 milestones), so per
-`.clinerules` rule 7 ("commit after each green milestone") it does not map
-cleanly to a milestone commit. It is currently only reflected in the
-packaged `.exe` build, not in git history. **Recommend a manual commit**
-(e.g. `git add -A && git commit -m "Feature: dashed border + corner glyph
-for expand buttons"`) once the user is happy with it, so the packaged build
-and the repo history stay in sync.
+None currently. The expand-button visual-distinction work (§3, 2026-09-14
+entry) was committed as `bdcf0c2` ("Feature: dashed border + corner glyph
+for expand buttons; add PROJECT_STATUS.md"), which also added this file to
+version control. This section will be repopulated if/when future work is
+left uncommitted between sessions.
 
 ## 3. Change log (reverse chronological)
 
@@ -88,7 +78,29 @@ running, `%APPDATA%\PasteWheel\config.json` present and valid, process
 terminated cleanly on request. Full MC-01–MC-16 spot-check remains the
 user's to run (SPEC §11.4/§16).
 
-**Status:** implemented and packaged; **not yet committed to git** (see §2).
+**Status:** implemented, packaged, and committed as `bdcf0c2`.
+
+---
+
+### 2026-09-14 — Linked GitHub remote
+
+Added the remote `origin` pointing at
+`https://github.com/AnzorAslanukov/PasteWheelV2.git` and pushed `master`.
+
+Before linking, audited the working tree for anything that needed a new
+`.gitignore` rule. Conclusion: **no changes to `.gitignore` were needed** —
+the existing rules (`.venv/`, `__pycache__/`, `*.pyc`, `.pytest_cache/`,
+`.ruff_cache/`, `build/`, `dist/`, `.coverage`) already correctly exclude
+every generated/local artifact present on disk (verified via
+`git status --ignored` and `git check-ignore -v`), including the 723 MB
+`.venv/`, the 118 MB `dist/` packaged build, and the 7 MB `build/`
+intermediate directory. No stray IDE folders, logs, or OS cruft
+(`.vscode/`, `.idea/`, `*.egg-info`, `.env`, `Thumbs.db`, `desktop.ini`)
+were found in the project directory.
+
+The pending uncommitted changes from the prior entry (expand-button
+glyph feature + this file) were committed first (`bdcf0c2`) so the pushed
+history matches the built `.exe`.
 
 ---
 
