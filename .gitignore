@@ -6,3 +6,11 @@ __pycache__/
 build/
 dist/
 .coverage
+
+# Personal developer-convenience scripts (not part of the app or test suite)
+update_github.py
+build_exe.py
+publish_release.py
+
+# Local secrets (e.g. saved GitHub token for publish_release.py)
+.secrets/
