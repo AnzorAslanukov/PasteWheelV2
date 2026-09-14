@@ -29,7 +29,7 @@ from typing import Any
 
 from PySide6.QtCore import QPoint, Qt
 from PySide6.QtGui import QGuiApplication
-from PySide6.QtWidgets import QPushButton, QWidget
+from PySide6.QtWidgets import QLabel, QPushButton, QWidget
 
 from pastewheel import geometry
 from pastewheel.state import WheelState
@@ -37,6 +37,12 @@ from pastewheel.state import WheelState
 CENTER_DOT_DIAMETER = 10
 POWER_TOOLTIP = "Quit PasteWheel"
 GEAR_TOOLTIP = "Settings"
+
+# Visual distinction between clipboard and expand buttons (not SPEC-mandated;
+# user-requested UX enhancement): expand buttons get a dashed border plus a
+# small "+" corner glyph; clipboard/power/gear/"+" buttons stay solid-border,
+# no glyph.
+EXPAND_GLYPH_DIAMETER = 16
 
 
 def _find_button(buttons: list[dict[str, Any]], button_id: str) -> dict[str, Any] | None:
@@ -48,18 +54,46 @@ def _find_button(buttons: list[dict[str, Any]], button_id: str) -> dict[str, Any
 
 
 class WheelButton(QPushButton):
-    """A single circular wheel button (clipboard, expand, power, gear, +)."""
+    """A single circular wheel button (clipboard, expand, power, gear, +).
 
-    def __init__(self, parent: QWidget, diameter: int = geometry.BUTTON_DIAMETER) -> None:
+    Expand buttons are visually distinguished from clipboard (and
+    power/gear/"+") buttons: a dashed border instead of a solid one, plus a
+    small "+" glyph badge in the top-right corner indicating expansion.
+    """
+
+    def __init__(
+        self,
+        parent: QWidget,
+        diameter: int = geometry.BUTTON_DIAMETER,
+        is_expand: bool = False,
+    ) -> None:
         super().__init__(parent)
         self.setFixedSize(diameter, diameter)
         self.setFocusPolicy(Qt.NoFocus)
+        border_style = "dashed" if is_expand else "solid"
         self.setStyleSheet(
             f"QPushButton {{ border-radius: {diameter // 2}px; "
             "background-color: rgba(60, 60, 60, 220); color: white; "
-            "border: 1px solid rgba(255, 255, 255, 60); }}"
+            f"border: 1px {border_style} rgba(255, 255, 255, 60); }}"
             "QPushButton:hover { background-color: rgba(90, 90, 90, 230); }"
         )
+        self._expand_glyph: QLabel | None = None
+        if is_expand:
+            glyph = QLabel("+", self)
+            glyph.setObjectName("expand_glyph")
+            glyph.setFixedSize(EXPAND_GLYPH_DIAMETER, EXPAND_GLYPH_DIAMETER)
+            glyph.setAlignment(Qt.AlignCenter)
+            glyph.setAttribute(Qt.WA_TransparentForMouseEvents)
+            glyph.setFocusPolicy(Qt.NoFocus)
+            glyph.setStyleSheet(
+                f"QLabel {{ border-radius: {EXPAND_GLYPH_DIAMETER // 2}px; "
+                "background-color: rgba(230, 230, 230, 235); color: black; "
+                "font-weight: bold; border: 1px solid rgba(0, 0, 0, 120); }}"
+            )
+            # Anchor to the top-right corner of the circular button.
+            glyph.move(diameter - EXPAND_GLYPH_DIAMETER, 0)
+            glyph.show()
+            self._expand_glyph = glyph
 
 
 class WheelWindow(QWidget):
@@ -273,14 +307,14 @@ class WheelWindow(QWidget):
         self._ring_widgets[level] = widgets
 
     def _make_ring_button(self, level: int, button_data: dict[str, Any]) -> WheelButton:
-        button = WheelButton(self)
+        button_type = button_data.get("type")
+        button = WheelButton(self, is_expand=(button_type == "expand"))
         label = button_data.get("label", "")
         tooltip = button_data.get("tooltip") or label
         button.setText(label)
         button.setToolTip(tooltip)  # FR-2.4: hover tooltip (configured, else label)
         button.setAccessibleName(tooltip)  # FR-2.7
         button_id = button_data.get("id")
-        button_type = button_data.get("type")
         if button_type == "clipboard":
             string = button_data.get("string", "")
             button.clicked.connect(lambda: self._handle_clipboard_click(string))

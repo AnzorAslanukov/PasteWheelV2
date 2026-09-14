@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from PySide6.QtCore import QPoint, Qt
 from PySide6.QtTest import QTest
+from PySide6.QtWidgets import QWidget
 
 from pastewheel.wheel_window import GEAR_TOOLTIP, POWER_TOOLTIP, WheelWindow
 
@@ -148,6 +149,82 @@ def test_fr_2_4_configured_tooltip_takes_priority(qtbot):
     window.show_at(CENTER, SCREEN_RECT)
 
     assert window._ring_widgets[1][0].toolTip() == "Custom tooltip"
+
+
+# --- Button type visual distinction: dashed border + "+" corner glyph ---
+# (User-requested UX enhancement, not tied to a specific FR id.)
+
+
+def test_clipboard_button_has_solid_border_and_no_glyph(qtbot):
+    window = _make_window(qtbot)
+    window.set_buttons([_clipboard_button()])
+    window.show_at(CENTER, SCREEN_RECT)
+
+    button = window._ring_widgets[1][0]
+    assert "solid" in button.styleSheet()
+    assert "dashed" not in button.styleSheet()
+    assert button._expand_glyph is None
+    assert button.findChild(QWidget, "expand_glyph") is None
+
+
+def test_expand_button_has_dashed_border_and_plus_glyph(qtbot):
+    window = _make_window(qtbot)
+    window.set_buttons([_expand_button()])
+    window.show_at(CENTER, SCREEN_RECT)
+
+    button = window._ring_widgets[1][0]
+    assert "dashed" in button.styleSheet()
+    assert button._expand_glyph is not None
+    assert button._expand_glyph.text() == "+"
+    assert button._expand_glyph.isVisible()
+
+
+def test_expand_glyph_is_transparent_for_mouse_events(qtbot):
+    """The glyph must not intercept clicks meant for the expand button."""
+    window = _make_window(qtbot)
+    window.set_buttons([_expand_button()])
+    window.show_at(CENTER, SCREEN_RECT)
+
+    glyph = window._ring_widgets[1][0]._expand_glyph
+    assert glyph.testAttribute(Qt.WA_TransparentForMouseEvents)
+
+
+def test_expand_button_click_still_works_with_glyph_present(qtbot):
+    """Sanity check: adding the glyph doesn't break FR-3.2 expand toggling."""
+    window = _make_window(qtbot)
+    window.set_buttons([_expand_button()])
+    window.show_at(CENTER, SCREEN_RECT)
+
+    QTest.mouseClick(window._ring_widgets[1][0], Qt.LeftButton)
+
+    assert window.state.is_expand_on("e1", level=1) is True
+
+
+def test_power_gear_and_plus_buttons_have_solid_border_and_no_glyph(qtbot):
+    window = _make_window(qtbot)
+    window.set_buttons([])
+    window.show_at(CENTER, SCREEN_RECT)
+
+    for button in (window._power_button, window._gear_button, window._center_widget):
+        assert "solid" in button.styleSheet()
+        assert "dashed" not in button.styleSheet()
+        assert button._expand_glyph is None
+
+
+def test_l3_clipboard_only_children_have_solid_border_and_no_glyph(qtbot):
+    """FR-3.3: L3 is clipboard-only, so no L3 button should ever be dashed."""
+    window = _make_window(qtbot)
+    l3_child = _clipboard_button("c3", "OK", "ok")
+    l2_expand = _expand_button("e2", "🔧", children=[l3_child])
+    window.set_buttons([_expand_button(children=[l2_expand])])
+    window.show_at(CENTER, SCREEN_RECT)
+
+    QTest.mouseClick(window._ring_widgets[1][0], Qt.LeftButton)  # open L2
+    QTest.mouseClick(window._ring_widgets[2][0], Qt.LeftButton)  # open L3
+
+    l3_button = window._ring_widgets[3][0]
+    assert "solid" in l3_button.styleSheet()
+    assert l3_button._expand_glyph is None
 
 
 # --- FR-2.6: first run (zero L1 buttons) shows only "+" and power/gear --
